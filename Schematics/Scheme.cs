@@ -186,14 +186,14 @@ namespace Schematics
                 {
                     int newX = x + (h * i);
                     int midX = newX + (h / 2);
-                    TSPlayer.All.SendTileSquare(midX, y + (h / 2), h);
+                    TSPlayer.All.SendTileSquare(midX, y + (h / 2), h + 1 );
                 }
 
                 if (rem != 0)
                 {
                     int newX = x + w - h;
                     int midX = newX + (h / 2);
-                    TSPlayer.All.SendTileSquare(midX, y + (h / 2), h + 1);
+                    TSPlayer.All.SendTileSquare(midX, y + (h / 2), h);
                 }
             }
             else
