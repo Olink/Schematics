@@ -63,19 +63,11 @@ namespace Schematics
                     data.wallFrameY = Main.tile[x + i, y + j].Data.wallFrameY;
                     data.wire = Main.tile[x + i, y + j].Data.wire;
 
-                    if (Main.tile[x + i, y + j].type == 21 && !useChests)
+                    if (Main.tile[x + i, y + j].type == 21)
                     {
-                        data.type = 0;
-                        data.active = false;
-                    }
-                    else if (Main.tile[x + i, y + j].type == 21)
-                    {
-                        data.type = 0;
-                        data.active = false;
                         int id = Terraria.Chest.FindChest(x + i, y + j);
                         if (id != -1 && !chests.ContainsKey(id))
                         {
-                            Console.WriteLine( "Chest is saved" );
                             Chest c = Main.chest[id];
                             Chest2 temp = new Chest2( Chest.maxItems, (c.x - x), (c.y - y));
 
@@ -136,6 +128,13 @@ namespace Schematics
                     t.wallFrameY = data.wallFrameY;
                     t.wire = data.wire;
                     Tile tile = new Tile(Main.tile, x + i, y + j);
+
+                    if( t.type == 21 && !useChests )
+                    {
+                        t.type = 0;
+                        t.active = false;
+                    }
+
                     tile.Data = t;
                 }
             }
@@ -144,7 +143,7 @@ namespace Schematics
             {
                 Chest2 c = kvpair.Value;
                 int success = Chest.CreateChest(c.x + x, c.y + y);
-                if (success == -1)
+                if (success == -1 && !nagged)
                 {
                     args.Player.SendMessage("You have reached the maximum of chests, skipping the rest.", Color.Red);
                     nagged = true;
@@ -153,19 +152,17 @@ namespace Schematics
                 {
                     
                     Chest newChest = Main.chest[success];
-                    Console.WriteLine(String.Format("Placing Chests {0}, {1}", newChest.x, newChest.y));
-                    Console.WriteLine(String.Format("Player {0}, {1}", args.Player.TileX, args.Player.TileY));
                     for (int k = 0; k < c.item.Length; k++)
                     {
                         Item2 it2 = c.item[k];
 
-                        if (it2.netId == -100)
-                        {
+                        if (it2.netId < -50)
                             continue;
-                        }
 
-                        newChest.item[k].netID = it2.netId;
-                        newChest.item[k].stack = it2.stack;
+                        Item newItem = new Item();
+                        newItem.SetDefaults( it2.netId );
+                        newItem.stack = it2.stack;
+                        newChest.item[k] = newItem;
                     }
                 }
             }
