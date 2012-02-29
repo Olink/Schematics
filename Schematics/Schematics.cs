@@ -111,7 +111,28 @@ namespace Schematics
                     FileStream fs =
                         new FileStream(path, FileMode.Open, FileAccess.Read);
 
-                    Scheme s = (Scheme)bf.Deserialize(fs);
+                    Scheme s = null;
+                    try
+                    {
+                        s = (Scheme)bf.Deserialize(fs);
+                    }
+                    catch (System.InvalidCastException e)
+                    {
+                        try
+                        {
+                            TileData2[][] tiles = (TileData2[][])bf.Deserialize(fs);
+                            s = new Scheme(false);
+                            s.tiles = tiles;
+                        }
+                        catch (System.InvalidCastException eInner)
+                        {
+                            fs.Close();
+                            args.Player.SendMessage("There was an error loading your schematic.", Color.Red);
+                            Log.ConsoleError(eInner.Message);
+                            return;
+                        }
+                        
+                    }
 
                     s.Load( args, x, y );
                     fs.Close();
